@@ -135,7 +135,7 @@ function Login() {
                             {isShowMessage && (
                                 <Box sx={{ display: 'flex', mt: 1, alignItems: 'center' }}>
                                     <Box sx={{ color: !isVerify ? '#ff424e' : 'green' }}>
-                                        <FaRegCheckCircle style={{ fontSize: '30px', alignItems: 'center' }} />
+                                        <FaRegCheckCircle style={{ fontSize: '30px', alignItems: 'center',  }} />
                                     </Box>
                                     <Typography
                                         sx={{
@@ -157,7 +157,7 @@ function Login() {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-                                sx={{ mt: 3, mb: 2, p: 1, backgroundColor: '#f69d4d', fontSize: '1.4rem' }}
+                                sx={{ mt: 3, mb: 2, p: 1, backgroundColor: '#f69d4d', fontSize: '1.4rem', borderRadius: '50px'  }}
                             >
                                 Login
                             </Button>

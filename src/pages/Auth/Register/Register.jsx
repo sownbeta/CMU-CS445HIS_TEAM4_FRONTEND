@@ -114,7 +114,7 @@ function Register() {
                                 {...register('email')}
                             />
                             {errors.email && (
-                                <FormHelperText error sx={{ fontSize: '12px' }}>
+                                <FormHelperText error sx={{ fontSize: '11px' }}>
                                     {errors.email.message}
                                 </FormHelperText>
                             )}
@@ -155,13 +155,13 @@ function Register() {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-                                sx={{ mt: 3, mb: 2, p: 1.5, backgroundColor: '#f69d4d', fontSize: '1.4rem' }}
+                                sx={{ mt: 3, mb: 2, p: 1.5, backgroundColor: '#f69d4d', fontSize: '1.4rem', borderRadius: '50px' }}
                             >
                                 Register
                             </Button>
                             <Grid container>
                                 <Grid item xs>
-                                    <Link to="/login" variant="body2" sx={{ fontSize: '12px', color: '#407087' }}>
+                                    <Link to="/login" variant="body2" sx={{ fontSize: '11px', color: '#407087' }}>
                                         {"Don't have an account? Login"}
                                     </Link>
                                 </Grid>
