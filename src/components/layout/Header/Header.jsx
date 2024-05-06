@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import classNames from 'classnames/bind';
 import { IoNotifications } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '~/assets/images/logo.png';
+import logo from '~/assets/images/logo.jpg';
 import styles from './Header.module.scss';
 import Cookies from 'universal-cookie';
 const cx = classNames.bind(styles);
@@ -19,15 +19,12 @@ export default function Header() {
         navigate('/login');
     };
 
-   
-
     return (
         <div className={cx('wrapper')}>
-            <Link to="/" className={cx('logo')} >
-                    <img src={logo} alt="Home"/>
-                    <img src="/src/assets/images/Logo1.png" alt="Home"></img>
-            </Link>
-            
+            <div className={cx('logo')}>
+                <img src={logo} />
+            </div>
+
             <div className={cx('menu')}>
                 <IconButton color="primary" aria-label="add to shopping cart">
                     <div className={cx('icon')}>
@@ -41,7 +38,7 @@ export default function Header() {
                             size="large"
                             className={cx('btn-register')}
                             onClick={handleLogout}
-                            sx={{ backgroundColor: '#f69d4d', ':hover': 'opacity : 0.8' }}
+                            sx={{ backgroundColor: '#3e99ea', ':hover': 'opacity : 0.8' }}
                         >
                             Log out
                         </Button>
@@ -54,7 +51,7 @@ export default function Header() {
                             size="large"
                             className={cx('btn-register')}
                             onClick={() => navigate('/register')}
-                            sx={{ backgroundColor: '#f69d4d', ':hover': 'opacity : 0.8' }}
+                            sx={{ backgroundColor: '#3e99ea', ':hover': 'opacity : 0.8' }}
                         >
                             Register
                         </Button>
@@ -63,7 +60,7 @@ export default function Header() {
                             variant="contained"
                             size="large"
                             onClick={() => navigate('/login')}
-                            sx={{ backgroundColor: '#f69d4d' }}
+                            sx={{ backgroundColor: '#3e99ea' }}
                         >
                             Login
                         </Button>
