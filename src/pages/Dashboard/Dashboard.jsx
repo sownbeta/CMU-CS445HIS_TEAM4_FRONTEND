@@ -13,6 +13,8 @@ import { AuthContext } from '~/components/AuthContext/AuthContext';
 import { uniqueValuesByKey } from '~/utils/algorithms';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts';
+import { useNavigate } from 'react-router-dom';
+
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'fullName', headerName: 'FULL NAME', width: 160 },
@@ -40,18 +42,12 @@ const columns = [
         type: 'number',
         width: 170,
     },
-    // {
-    //     field: 'fullName',
-    //     headerName: 'Full name',
-    //     description: 'This column has a value getter and is not sortable.',
-    //     sortable: false,
-    //     width: 160,
-    //     valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
-    // },
 ];
 
 const cx = classNames.bind(styles);
 export default function Dashboard() {
+    const navigate = useNavigate();
+
     const [viewData, setViewData] = useState([]);
     const [allData, setAllData] = useState([]);
     const [gender, setGender] = useState('');
@@ -62,6 +58,9 @@ export default function Dashboard() {
     const [typeJob, setTypeJob] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [year, setYear] = useState('');
+    const [birthdayEmployeeList, setBirthdayEmployeeList] = useState([]);
+    const [nonShareholderBf, setNonShareholderBf] = useState(0);
+    const [shareholderBf, setShareholderBf] = useState(0);
 
     const currentUser = useContext(AuthContext);
 
@@ -110,9 +109,9 @@ export default function Dashboard() {
         const fetchViewData = async () => {
             try {
                 setIsLoading(true);
+                //gọi api
                 const res = await request.get(`/view/human/employees?${paramsString}`);
                 if (res && res.data) {
-                    console.log(res?.data);
                     setAllData(res?.data);
                     setViewData(rowsData(res?.data?.viewData));
                     setIsLoading(false);
@@ -167,6 +166,46 @@ export default function Dashboard() {
         fetchDepartment();
     }, []);
 
+    useEffect(() => {
+        const fetchBirthday = async () => {
+            try {
+                setIsLoading(true);
+                const res = await request.get('/view/employee/birthday');
+                if (res && res?.data) {
+                    setIsLoading(false);
+                    setBirthdayEmployeeList(res.data);
+                }
+            } catch (error) {
+                setIsLoading(false);
+                toast.error(error?.response?.data?.message, {
+                    position: 'top-center',
+                });
+            }
+        };
+        fetchBirthday();
+    }, []);
+
+    useEffect(() => {
+        const fetchShareholderBf = async () => {
+            try {
+                setIsLoading(true);
+                const res = await request.get('/view/calc-benefit-plans');
+                if (res && res?.data) {
+                    setIsLoading(false);
+                    setShareholderBf(res.data.totalPlanBenefitShareholder);
+                    setNonShareholderBf(res.data.nonTotalPlanBenefitShareholder);
+                }
+            } catch (error) {
+                setIsLoading(false);
+                toast.error(error?.response?.data?.message, {
+                    position: 'top-center',
+                });
+            }
+        };
+        fetchShareholderBf();
+    }, []);
+
+
     return (
         <Box className={cx('wrapper')} sx={{ display: 'flex', backgroundColor: '#eaeceb' }}>
             <Sidebar />
@@ -208,18 +247,18 @@ export default function Dashboard() {
                             {allData?.totalEarningLastYear + allData?.totalEarningCurrentYear}
                         </div>
                     </div>
-
                     <div className={cx('card-wrapper')}>
-                        <div className={cx('card-title')}>Total Vacation Day</div>
+                        <div className={cx('card-title')} onClick={() => navigate('/notification')}>Total Vacation Day
+                        </div>
                         <div className={cx('card-vale')}>{allData.totalVacationDay}</div>
                     </div>
                     <div className={cx('card-wrapper')}>
                         <div className={cx('card-title')}>Total Employees</div>
                         <div className={cx('card-vale')}>{personalData?.length}</div>
                     </div>
-                    <div className={cx('card-wrapper')}>
-                        <div className={cx('card-title')}>Total Earning</div>
-                        <div className={cx('card-vale')}>300300</div>
+                    <div className={cx('card-wrapper')} onClick={() => navigate('/notification')}>
+                        <div className={cx('card-title')}>Total birthday in current month</div>
+                        <div className={cx('card-vale')}>{birthdayEmployeeList.length}</div>
                     </div>
                 </div>
 
@@ -234,7 +273,9 @@ export default function Dashboard() {
                                 label="Gender"
                                 onChange={(e) => setGender(e.target.value)}
                             >
-                                <MenuItem value={''}>All</MenuItem>
+                                <MenuItem sx={{ fontSize: '1.2rem' }} value={''}>
+                                    All
+                                </MenuItem>
                                 <MenuItem value={'Nam'}>Male</MenuItem>
                                 <MenuItem value={'Nữ'}>Female</MenuItem>
                                 <MenuItem value={'Khác'}>Other</MenuItem>
@@ -257,22 +298,7 @@ export default function Dashboard() {
                             </Select>
                         </FormControl>
                     </div>
-                    <div className={cx('item')}>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Year</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={year}
-                                label="Age"
-                                onChange={(e) => setYear(e.target.value)}
-                            >
-                                <MenuItem value={''}>All</MenuItem>
-                                <MenuItem value={1}>Current Year</MenuItem>
-                                <MenuItem value={0}>Last Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
+
                     <div className={cx('item')}>
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-label">Type Job</InputLabel>
@@ -325,8 +351,22 @@ export default function Dashboard() {
                                 label: 'Total Earning',
                             },
                         ]}
-                        width={500}
+                        width={480}
                         height={400}
+                        fontSize={20}
+                    />
+
+                    <BarChart
+                        xAxis={[{ scaleType: 'band', data: ['Shareholder', 'Non-Shareholder'] }]}
+                        series={[
+                            {
+                                data: [shareholderBf, nonShareholderBf],
+                                label: 'Total Benefit Plans ',
+                            },
+                        ]}
+                        width={480}
+                        height={400}
+                        fontSize={20}
                     />
 
                     {departments.length > 0 && (
@@ -344,11 +384,13 @@ export default function Dashboard() {
                                     cy: 190,
                                 },
                             ]}
-                            width={600}
+                            width={450}
                             height={400}
                         />
                     )}
-                    <div className={cx('description')}></div>
+                    <div className={cx('description')}>
+
+                    </div>
                 </div>
                 <div className={cx('table')}>
                     {isLoading ? (
@@ -364,7 +406,7 @@ export default function Dashboard() {
                             }}
                             pageSizeOptions={[5, 10]}
                             checkboxSelection
-                            sx={{ fontSize: '1.2rem' }}
+                            sx={{ fontSize: '1.3rem' }}
                         />
                     )}
                 </div>
